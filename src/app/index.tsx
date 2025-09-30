@@ -17,6 +17,8 @@ import {
 import { useSensors } from "@/hooks/useSensors";
 import { CircularProgress } from "@/src/components/CircularProgress";
 import { MetricCard } from "@/src/components/MetricCard";
+import { Statistic } from "@/src/components/statistics";
+import { useState, useEffect } from "react";
 
 
 export default function MonitorScreen() {
@@ -30,6 +32,24 @@ export default function MonitorScreen() {
     error,
     toggleRecording,
   } = useSensors();
+
+// CONTROLE DE STATUS DE TREINO (utilizado para renderizar posteriormente o resumo do treino)
+  const [status, setStatus] = useState<"idle" |"training" | "notTraining">( "idle" );
+  useEffect(() => {
+    if (isRecording) {
+      setStatus("training"); // treino começou
+    } else if (status === "training") {
+      setStatus("notTraining"); // treino terminou
+    }
+  }, [isRecording]); // atualiza o status quando isRecording muda
+
+  // AQUI É ARMAZENADO O RESUMO DO TREINO
+  const [resumo, setResumo] = useState('');
+  useEffect(() => {
+    if(status == "notTraining"){
+      setResumo('passou? SIM!')
+    }
+  }, [status]);
 
   // ========== FUNÇÕES AUXILIARES ==========
 
@@ -171,6 +191,20 @@ export default function MonitorScreen() {
           />
         </View>
       </ScrollView>
+
+
+    {/* 
+      Visualizar primeiro a linha 35 - 51. 
+      RESUMÃO:
+        A ideia é que ao finalizar o treino, apareça as estatísticas resumidas.
+        Lógica: para ficar mais didático na explicação eu criei um novo useState
+        para definir o estado do botão (treinando ou nãoTreinando), ao trocar de
+        "treinando" para "nãoTreinando" vai disparar um efeito colaterál -> aparecer
+        as estatísticas de resumo.
+    */}
+
+      <Statistic dados={resumo}/>;
+
 
       {/* Botão de Gravação */}
       <View style={styles.recordingContainer}>

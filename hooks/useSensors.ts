@@ -100,6 +100,17 @@ export function useSensors() {
       setIsRecording(false);
       subscriptions.current.forEach(sub => sub?.remove?.());
       subscriptions.current = [];
+
+      // Resetar métricas ao encerrar
+      setMetrics({
+        steps: 0,
+        avgAcceleration: 0,
+        avgRotation: 0,
+        duration: 0,
+        intensity: 'baixa',
+        movementType: 'parado',
+      });
+
     } else {
       // Iniciar recording
       if (!permissionsGranted) {
